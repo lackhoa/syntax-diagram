@@ -1,0 +1,8 @@
+{:source-paths ["src"]
+ :dependencies []
+ :dev-http {8080 "resources/public"}
+ :builds {:dev {:output-dir "resources/public/js"
+                :asset-path "js"
+                :target :browser
+                :modules {:main {:init-fn app.main/main!}}
+                :devtools {:after-load app.main/reload!}}}}
