@@ -1,2 +1,5 @@
-resources/public/js
-.shadow-cljs
+frontend/resources/public/js
+frontend/.shadow-cljs
+*/node_modules
+*/package-lock.json
+backend/.env

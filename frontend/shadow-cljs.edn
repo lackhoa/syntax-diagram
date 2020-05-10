@@ -1,0 +1,8 @@
+{:source-paths ["src"]
+ :dependencies [[reagent "0.10.0"]]
+ :dev-http {8080 "resources/public"}
+ :builds {:dev {:output-dir "resources/public/js"
+                :asset-path "js"
+                :target :browser
+                :modules {:main {:init-fn syntax-diagram.main/main!}}
+                :devtools {:after-load syntax-diagram.main/reload!}}}}
