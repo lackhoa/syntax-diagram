@@ -15,7 +15,7 @@ let api = `https://language.googleapis.com/v1/documents:analyzeSyntax?key=${key}
 app.set('trust proxy', 1);
 
 // Limit each IP to one request/sec
-let limiter = rateLimit({ windowMs: 1000, max: 1 })
+let limiter = rateLimit({ windowMs: 1000, max: 2 })
 app.use(limiter);
 
 // Allow CORS from any origin
