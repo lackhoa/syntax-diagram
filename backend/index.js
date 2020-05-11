@@ -7,7 +7,7 @@ let fetch = require("node-fetch");
 let rateLimit = require("express-rate-limit");
 var cors = require("cors");
 let app = express();
-let port = 3000;
+let port = process.env.port;
 let key = process.env.key;
 let api = `https://language.googleapis.com/v1/documents:analyzeSyntax?key=${key}`;
 
