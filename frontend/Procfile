@@ -1,1 +1,1 @@
-release: shadow-cljs release app
+release: npx shadow-cljs release app
