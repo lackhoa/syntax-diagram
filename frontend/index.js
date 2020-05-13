@@ -1,3 +1,4 @@
+// Just a simple server for static files
 let express = require("express");
 let app = express();
 app.use(express.static("resources/public"))
