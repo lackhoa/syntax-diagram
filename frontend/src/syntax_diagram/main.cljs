@@ -13,6 +13,7 @@
 ;; Holds the data of the submitted text's syntax
 ;; Besides API info, each tokens is associated a `depth`, a `selected?` flag, and a `highlighted?` flag
 (defonce state (r/atom {:sentences [] :tokens [] :newlines []}))
+(def dark-theme? (r/atom false))
 
 (defn enumerate [ls]
   (for [[x i] (map vector ls (range))] [x i]))
@@ -82,7 +83,9 @@
 (defonce text-buffer (r/atom ""))
 (defn input []
   [:textarea#input
-   {:style {:width "100%", :font-size "1.5em"}
+   {:style {:width "100%", :font-size "1.5em"
+            :color (if @dark-theme? "white" "black")
+            :background (if @dark-theme? "black" "white")}
     :key "input-textarea"
     :rows "10"
     :placeholder "Type your text here!"
@@ -141,20 +144,34 @@
 (defn diagram []
   [:div#diagram {:style {:display "flex",
                          :flex-direction "column",
-                         :border "dotted", :padding "0.5em"}}
+                         :border "dotted", :padding "0.5em"
+                         :color (if @dark-theme? "white" "black")
+                         :background (if @dark-theme? "black" "white")}}
    (for [group (split-tokens-newline (:tokens @state)
                                      (:newlines @state))
          :when (not-empty group)]
      [:div {:style {:display "flex", :flex-wrap "wrap"}}
       (for [token group] [token-cpn token])])])
 
+(defn theme-selector []
+  [:button {:style {:font-size "2em"
+                    :max-width "300px"
+                    :align-self "flex-end"}
+            :onClick (fn [e] (swap! dark-theme? not))}
+   (if @dark-theme? "Light" "Dark")])
+
 ;; Render the whole app
+(defn container []
+  [:div#container {:style {:display "flex"
+                           :flex-direction "column"
+                           :background (if @dark-theme? "black" "white")}}
+   [theme-selector]
+   [input]
+   [submit-btn]
+   [diagram]])
+
 (rdom/render
- [:div {:style {:display "flex"
-                :flex-direction "column"}}
-  [input]
-  [submit-btn]
-  [diagram]]
+ [container]
  (.getElementById js/document "app"))
 
 (defn reload! [] (println "Code reloaded!"))

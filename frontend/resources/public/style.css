@@ -1,5 +1,2 @@
-* {
-    /* We want the canvas to take up the entire screen*/
-    background: black;
-    color: white;
-}
+* {margin  : 0;
+   padding : 0}
