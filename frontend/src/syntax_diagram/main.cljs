@@ -14,6 +14,11 @@
 ;; Besides API info, each tokens is associated a `depth`, a `selected?` flag, and a `highlighted?` flag
 (defonce state (r/atom {:sentences [] :tokens [] :newlines []}))
 (def dark-theme? (r/atom false))
+(defn theme-adapt [dark-theme?]
+  {:background (if dark-theme? "black" "white")
+   :color (if dark-theme? "white" "black")})
+
+(def uneven? (r/atom true))
 
 (defn enumerate [ls]
   (for [[x i] (map vector ls (range))] [x i]))
@@ -83,9 +88,9 @@
 (defonce text-buffer (r/atom ""))
 (defn input []
   [:textarea#input
-   {:style {:width "100%", :font-size "1.5em"
-            :color (if @dark-theme? "white" "black")
-            :background (if @dark-theme? "black" "white")}
+   {:style (merge {:width "90%", :font-size "1.5em"
+                   :align-self "center"}
+                  (theme-adapt @dark-theme?))
     :key "input-textarea"
     :rows "10"
     :placeholder "Type your text here!"
@@ -99,8 +104,10 @@
                {:style {:align-self "center", :margin "10px"}}]
     ;; The real button is here
     :else [:button#submit-btn {:style {:font-size "2em"
+                                       :color (if @dark-theme? "white" "black")
                                        :background "darkcyan"
-                                       :align-self "center"}
+                                       :align-self "center"
+                                       :margin "10px"}
                                :onClick (fn [e] (submit @text-buffer))}
            "Analyze!"]))
 
@@ -113,7 +120,8 @@
         highlighted? (:highlighted? token)]
     [:span {:style {:padding "2px", :position "relative"
                     :font-size "1.5em"
-                    :top (str (* 1 (:depth token)) "px")
+                    :top (str (if @uneven? (* 1 (:depth token))
+                                  0) "px")
                     :background (cond @selected? "blue"
                                       @highlighted? "darkcyan"
                                       :else "inherit")
@@ -142,30 +150,43 @@
 
 ;; Component to render the outcome of syntax analysis
 (defn diagram []
-  [:div#diagram {:style {:display "flex",
-                         :flex-direction "column",
-                         :border "dotted", :padding "0.5em"
-                         :color (if @dark-theme? "white" "black")
-                         :background (if @dark-theme? "black" "white")}}
+  [:div#diagram {:style (merge {:display "flex",
+                                :flex-direction "column",
+                                :border "dotted", :padding "0.5em"}
+                               (theme-adapt @dark-theme?))}
    (for [group (split-tokens-newline (:tokens @state)
                                      (:newlines @state))
          :when (not-empty group)]
      [:div {:style {:display "flex", :flex-wrap "wrap"}}
       (for [token group] [token-cpn token])])])
 
+(def checkbox-style
+  {:transform "scale(2)"
+   :margin "10px"})
+
 (defn theme-selector []
-  [:button {:style {:font-size "2em"
-                    :max-width "300px"
-                    :align-self "flex-end"}
-            :onClick (fn [e] (swap! dark-theme? not))}
-   (if @dark-theme? "Light" "Dark")])
+  [:input {:style checkbox-style
+           :type "checkbox" :onChange (fn [e] (swap! dark-theme? not))
+           :checked @dark-theme?}])
+
+(defn uneven-checkbox []
+  [:input {:style checkbox-style
+           :type "checkbox" :onChange (fn [e] (swap! uneven? not))
+           :checked @uneven?}])
 
 ;; Render the whole app
 (defn container []
   [:div#container {:style {:display "flex"
                            :flex-direction "column"
                            :background (if @dark-theme? "black" "white")}}
-   [theme-selector]
+   [:div {:style {:display "flex"
+                  :justify-content "flex-end"}}
+    [:div {:style (merge {:font-size "1.5em"}
+                         (theme-adapt @dark-theme?))}
+     [uneven-checkbox] "Uneven render"]
+    [:div {:style (merge {:font-size "1.5em"}
+                         (theme-adapt @dark-theme?))}
+     [theme-selector] "Dark theme"]]
    [input]
    [submit-btn]
    [diagram]])
@@ -183,7 +204,7 @@
    This is a prototype web application to make long and complicated text easier to read. We can achieve this by making the syntactic structure of the text apparent as follows:
    1. We start by breaking the text down into sentences. Sentences are viewed to be independent of each other.
    2. We further break each sentence down into tokens. Loosely speaking, each token corresponds to a word.
-   3. According to the theory in use, each token depends (supports) another token. For example: The word \"very\" depends on the word \"nice\" in the sentence \"This is very nice!\".
+   3. According to the theory in use, each token depends (supports) another token. For example: The token \"very\" depends on the token \"nice\" in the sentence \"This is very nice!\".
    We highlight this dependency like so: when you hover over a token, the token that it depends on will be highlighted.
    4. Some tokens aren't dependent on any other tokens. We call these \"roots\".
    Roots are outlined. Such as the first token in the sentence \"Ask not what your country can do for your.\"
