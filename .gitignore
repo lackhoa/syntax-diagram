@@ -1,4 +1,4 @@
-frontend/resources/public/js
+frontend/resources/public/js/manifest.edn
 frontend/.shadow-cljs
 */node_modules
 */package-lock.json
