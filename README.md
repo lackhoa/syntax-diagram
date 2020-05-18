@@ -1,6 +1,8 @@
 # Intro
-Proptotype website: https://syntax-diagram.herokuapp.com/
 This is a proptotype web application to make long and complicated text easier to read. We can achieve this by making the syntactic structure of the text apparent.
+
+Proptotype website: https://syntax-diagram.herokuapp.com/
+
 # How it works
 1. We start by breaking the text down into sentences. Sentences are viewed to be independent of each other.
 2. We further break each sentence down into tokens. Loosely speaking, each token corresponds to a word.
