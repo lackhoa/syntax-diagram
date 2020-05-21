@@ -13,10 +13,17 @@
 ;; Holds the data of the submitted text's syntax
 ;; Besides API info, each tokens is associated a `depth`, a `selected?` flag, and a `highlighted?` flag
 (defonce state (r/atom {:sentences [] :tokens [] :newlines []}))
-(def dark-theme? (r/atom false))
-(defn theme-adapt [dark-theme?]
-  {:background (if dark-theme? "black" "white")
-   :color (if dark-theme? "white" "black")})
+(defonce dark-theme?  ;; Can be stored in localStorage
+  (case (.getItem js/localStorage "dark-theme?")
+    "true" (r/atom true)
+    (r/atom false)))
+(defn get-theme []
+  (if @dark-theme? {:color "white" :background "black"}
+      {:color "black" :background "white"}))
+(defonce theme (r/atom (get-theme)))
+(add-watch dark-theme? :adapt-color
+           (fn [_ _ _ _]
+             (reset! theme (get-theme))))
 
 (def uneven? (r/atom true))
 
@@ -90,7 +97,7 @@
   [:textarea#input
    {:style (merge {:width "90%", :font-size "1.5em"
                    :align-self "center"}
-                  (theme-adapt @dark-theme?))
+                  @theme)
     :key "input-textarea"
     :rows "10"
     :placeholder "Type your text here!"
@@ -104,7 +111,7 @@
                {:style {:align-self "center", :margin "10px"}}]
     ;; The real button is here
     :else [:button#submit-btn {:style {:font-size "2em"
-                                       :color (if @dark-theme? "white" "black")
+                                       :color (:color @theme)
                                        :background "darkcyan"
                                        :align-self "center"
                                        :margin "10px"}
@@ -153,11 +160,12 @@
   [:div#diagram {:style (merge {:display "flex",
                                 :flex-direction "column",
                                 :border "dotted", :padding "0.5em"}
-                               (theme-adapt @dark-theme?))}
+                               @theme)}
    (for [group (split-tokens-newline (:tokens @state)
                                      (:newlines @state))
          :when (not-empty group)]
-     [:div {:style {:display "flex", :flex-wrap "wrap"}}
+     [:div {:style {:display "flex", :flex-wrap "wrap"
+                    :padding-bottom "1em"}}
       (for [token group] [token-cpn token])])])
 
 (def checkbox-style
@@ -166,7 +174,11 @@
 
 (defn theme-selector []
   [:input {:style checkbox-style
-           :type "checkbox" :onChange (fn [e] (swap! dark-theme? not))
+           :type "checkbox" :onChange
+           (fn [e]
+             (let [v (not @dark-theme?)]
+               (reset! dark-theme? v)
+               (.setItem js/localStorage "dark-theme?" v)))
            :checked @dark-theme?}])
 
 (defn uneven-checkbox []
@@ -178,14 +190,14 @@
 (defn container []
   [:div#container {:style {:display "flex"
                            :flex-direction "column"
-                           :background (if @dark-theme? "black" "white")}}
+                           :background (:background @theme)}}
    [:div {:style {:display "flex"
                   :justify-content "flex-end"}}
     [:div {:style (merge {:font-size "1.5em"}
-                         (theme-adapt @dark-theme?))}
+                         @theme)}
      [uneven-checkbox] "Uneven render"]
     [:div {:style (merge {:font-size "1.5em"}
-                         (theme-adapt @dark-theme?))}
+                         @theme)}
      [theme-selector] "Dark theme"]]
    [input]
    [submit-btn]
@@ -207,12 +219,11 @@
    3. According to the theory in use, each token depends (supports) another token. For example: The token \"very\" depends on the token \"nice\" in the sentence \"This is very nice!\".
    We highlight this dependency like so: when you hover over a token, the token that it depends on will be highlighted.
    4. Some tokens aren't dependent on any other tokens. We call these \"roots\".
-   Roots are outlined. Such as the first token in the sentence \"Ask not what your country can do for your.\"
+   Roots are outlined. Such as the first token in the sentence \"Ask not what your country can do for you.\"
    5. You may also notice that some tokens are lower than others. This is done to reflect their \"depths\". The rule is simple: if token \"x\" depends on token \"y\", \"x\" will be rendered lower than \"y\".
 
    That's it! For those interested on the theory, read up on \"dependency grammar\". The app is powered by Google Cloud Natural Language API.")
   (submit @text-buffer))
 
 ;; Todo:
-;; Make a deployment build
 ;; Why does it break on the “” characters?
