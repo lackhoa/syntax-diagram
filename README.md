@@ -1,5 +1,5 @@
 # Intro
-This is a proptotype web application to make long text easier to read. We can achieve this by making the syntactic structure of the text apparent.
+This is a proptotype web application to make long text easier to read. We can achieve this highlighting their syntactic structure.
 
 Proptotype website: https://syntax-diagram.herokuapp.com/
 
