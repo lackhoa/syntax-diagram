@@ -1,0 +1,19 @@
+name: "Frontend deploy"
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.0.4 # This is the action
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "syntax-diagram" #Must be unique in Heroku
+          heroku_email: "vodangkhoa873@gmail.com"
+          buildpack: "heroku/nodejs" #OPTIONAL
+          appdir: "frontend" # This is useful if the api you're deploying is in a subfolder
