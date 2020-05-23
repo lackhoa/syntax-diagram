@@ -25,7 +25,7 @@ app.use(cors());
 app.use(express.json());
 
 // Test route
-app.get("/", (req, res) => {res.send("This is just a test route, use POST instead")})
+app.get("/", (req, res) => {res.send("GET is not supported, use POST instead!")})
 // Relay whatever post request to the API
 app.post("/", (req, res) => {
     fetch(api, { method: "POST", body: JSON.stringify(req.body) })
