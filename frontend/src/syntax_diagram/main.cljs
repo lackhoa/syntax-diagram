@@ -14,9 +14,10 @@
 ;; Besides API info, each tokens is associated a `depth`, a `selected?` flag, and a `highlighted?` flag
 (defonce state (r/atom {:sentences [] :tokens [] :newlines []}))
 (defonce dark-theme?  ;; Can be stored in localStorage
-  (case (.getItem js/localStorage "dark-theme?")
-    "true" (r/atom true)
-    (r/atom false)))
+  (r/atom
+   (case (.getItem js/localStorage "dark-theme?")
+    "true" true
+    false)))
 (defn get-theme []
   (if @dark-theme? {:color "white" :background "black"}
       {:color "black" :background "white"}))
@@ -25,7 +26,11 @@
            (fn [_ _ _ _]
              (reset! theme (get-theme))))
 
-(def uneven? (r/atom true))
+(defonce uneven?
+  (r/atom
+   (case (.getItem js/localStorage "uneven?")
+     "false" false
+     true)))
 
 (defn enumerate [ls]
   (for [[x i] (map vector ls (range))] [x i]))
@@ -174,16 +179,20 @@
 
 (defn theme-selector []
   [:input {:style checkbox-style
-           :type "checkbox" :onChange
-           (fn [e]
-             (let [v (not @dark-theme?)]
-               (reset! dark-theme? v)
-               (.setItem js/localStorage "dark-theme?" v)))
+           :type "checkbox"
+           :onChange (fn [e]
+                       (let [v (not @dark-theme?)]
+                         (reset! dark-theme? v)
+                         (.setItem js/localStorage "dark-theme?" v)))
            :checked @dark-theme?}])
 
 (defn uneven-checkbox []
   [:input {:style checkbox-style
-           :type "checkbox" :onChange (fn [e] (swap! uneven? not))
+           :type "checkbox"
+           :onChange (fn [e]
+                       (let [v (not @uneven?)]
+                         (reset! uneven? v)
+                         (.setItem js/localStorage "uneven?" v)))
            :checked @uneven?}])
 
 ;; Render the whole app
