@@ -226,4 +226,6 @@
   (submit @text-buffer))
 
 ;; Todo:
+;; A little bit of that CD/CI wouldn't hurt: https://fireship.io/snippets/github-actions-deploy-angular-to-firebase-hosting/
+;; Add the uneven-render settings to localStorage
 ;; Why does it break on the “” characters?
