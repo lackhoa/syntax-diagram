@@ -13,8 +13,9 @@
     "shadow-cljs": "^2.9.2"
   },
   "scripts": {
-    "start": "node index.js"
+      "build": "shadow-cljs release app",
+      "start": "node index.js"
   },
-  "author": "",
-  "license": "ISC"
+    "author": "",
+    "license": "ISC"
 }

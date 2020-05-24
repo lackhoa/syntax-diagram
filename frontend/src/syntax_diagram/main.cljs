@@ -222,7 +222,7 @@
   (println "`main.cljs` started!")
   (reset! text-buffer
           "About:
-   This is a prototype web application to make long and complicated text easier to read. We can achieve this by making the syntactic structure of the text apparent as follows:
+   This is a prototype web application to make long text easier to read. We do this by highlighting its syntactic structure:
    1. We start by breaking the text down into sentences. Sentences are viewed to be independent of each other.
    2. We further break each sentence down into tokens. Loosely speaking, each token corresponds to a word.
    3. According to the theory in use, each token depends (supports) another token. For example: The token \"very\" depends on the token \"nice\" in the sentence \"This is very nice!\".
