@@ -225,7 +225,7 @@
    This is a prototype web application to make long text easier to read. We do this by highlighting its syntactic structure:
    1. We start by breaking the text down into sentences. Sentences are viewed to be independent of each other.
    2. We further break each sentence down into tokens. Loosely speaking, each token corresponds to a word.
-   3. According to the theory in use, each token depends (supports) another token. For example: The token \"very\" depends on the token \"nice\" in the sentence \"This is very nice!\".
+   3. Each token depends on (supports) another token. For example: The token \"very\" depends on the token \"nice\" in the sentence \"This is very nice!\".
    We highlight this dependency like so: when you hover over a token, the token that it depends on will be highlighted.
    4. Some tokens aren't dependent on any other tokens. We call these \"roots\".
    Roots are outlined. Such as the first token in the sentence \"Ask not what your country can do for you.\"
