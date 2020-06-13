@@ -12,6 +12,7 @@
 
 ;; Holds the data of the submitted text's syntax
 ;; Besides API info, each tokens is associated a `depth`, a `selected?` flag, and a `highlighted?` flag
+;; `state` only updates when we query new text, no user interaction can change it
 (defonce state (r/atom {:sentences [] :tokens [] :newlines []}))
 (defonce dark-theme?  ;; Can be stored in localStorage
   (r/atom
@@ -160,14 +161,11 @@
                 (concat [left]
                         (split-tokens-newline right (rest newlines))))))
 
-;; Component to render the outcome of syntax analysis
-(defn diagram []
-  [:div#diagram {:style (merge {:display "flex",
-                                :flex-direction "column",
-                                :border "dotted", :padding "0.5em"}
-                               @theme)}
-   (for [group (split-tokens-newline (:tokens @state)
-                                     (:newlines @state))
+;; Component to render the outcome of syntax analysis (performance-critical!)
+(defn diagram [state]
+  [:<>
+   (for [group (split-tokens-newline (:tokens state)
+                                     (:newlines state))
          :when (not-empty group)]
      [:div {:style {:display "flex", :flex-wrap "wrap"
                     :padding-bottom "1em"}}
@@ -178,22 +176,28 @@
    :margin "10px"})
 
 (defn theme-selector []
-  [:input {:style checkbox-style
+  [:div {:style (merge {:font-size "1.5em"}
+                         @theme)}
+     [:input {:style checkbox-style
            :type "checkbox"
            :onChange (fn [e]
                        (let [v (not @dark-theme?)]
                          (reset! dark-theme? v)
                          (.setItem js/localStorage "dark-theme?" v)))
-           :checked @dark-theme?}])
+           :checked @dark-theme?}]
+   "Dark theme"])
 
 (defn uneven-checkbox []
-  [:input {:style checkbox-style
+  [:div {:style (merge {:font-size "1.5em"}
+                         @theme)}
+     [:input {:style checkbox-style
            :type "checkbox"
            :onChange (fn [e]
                        (let [v (not @uneven?)]
                          (reset! uneven? v)
                          (.setItem js/localStorage "uneven?" v)))
-           :checked @uneven?}])
+           :checked @uneven?}]
+   "Uneven render"])
 
 ;; Render the whole app
 (defn container []
@@ -202,15 +206,16 @@
                            :background (:background @theme)}}
    [:div {:style {:display "flex"
                   :justify-content "flex-end"}}
-    [:div {:style (merge {:font-size "1.5em"}
-                         @theme)}
-     [uneven-checkbox] "Uneven render"]
-    [:div {:style (merge {:font-size "1.5em"}
-                         @theme)}
-     [theme-selector] "Dark theme"]]
+    [uneven-checkbox]
+    [theme-selector]]
    [input]
    [submit-btn]
-   [diagram]])
+   [:div#diagram {:style (merge {:display "flex",
+                                 :flex-direction "column",
+                                 :align-self "center",:width "90%",
+                                 :border "dotted", :padding "1em"}
+                                @theme)}
+    [diagram @state]]])
 
 (rdom/render
  [container]

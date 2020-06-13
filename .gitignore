@@ -1,6 +1,5 @@
-frontend/resources/public/js/manifest.edn
+frontend/resources/public/js/
 frontend/.shadow-cljs
-frontend/resources/public/js/cljs-runtime
 */node_modules
 */package-lock.json
 backend/.env
